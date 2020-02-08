@@ -1,0 +1,12 @@
+.env
+settings.ini
+# Compiled files
+*$py.class
+*.pyc
+# Generated files
+/*.bat
+/*.sh
+*.zip
+build/*
+bundle/*
+!*/.keep
