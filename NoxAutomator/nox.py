@@ -94,6 +94,7 @@ class NoxApp(object):
     LABEL = None
 
     IMAGE_ORIGINAL_WINDOW_HEIGHT = 375
+    IMAGE_ORIGINAL_WINDOW_WIDTH = 667
     UNKNOWN = "unknown"
     HIGHLIGHT_SEC = 1
 
@@ -123,6 +124,7 @@ class NoxApp(object):
         self.app_name = self.__class__.app_name()
         self.macro_name = self.__class__.macro_name()
         self.target = None
+        self.scale_base = "width"
 
         if self.app:
             self.app.focus()
@@ -175,7 +177,10 @@ class NoxApp(object):
         self.adjust_scale()
 
     def adjust_scale(self):
-        scale = self.get_region().h / float(self.IMAGE_ORIGINAL_WINDOW_HEIGHT)
+        if self.scale_base == "width":
+            scale = self.get_region().w / float(self.IMAGE_ORIGINAL_WINDOW_WIDTH)
+        else:
+            scale = self.get_region().h / float(self.IMAGE_ORIGINAL_WINDOW_HEIGHT)
         if scale != self.scale:
             self.scale = scale
             Settings.AlwaysResize = self.scale
