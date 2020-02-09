@@ -97,6 +97,7 @@ class NoxApp(object):
     IMAGE_ORIGINAL_WINDOW_WIDTH = 667
     UNKNOWN = "unknown"
     HIGHLIGHT_SEC = 1
+    CONFIG_JOINER = '.'
 
     @classmethod
     def app_name(self):
@@ -167,7 +168,7 @@ class NoxApp(object):
 
     @property
     def config_key(self):
-        return ":".join([self.app_name, self.macro_name])
+        return self.CONFIG_JOINER.join([self.app_name, self.macro_name])
 
     def prepare(self):
         if self.app:
@@ -336,13 +337,14 @@ class NoxApp(object):
             self.sleep(1.5)
             return reg
 
-    def type(self, text):
+    def type(self, text, force_focus=False):
         if self.app:
             self.app.focus()
-        with self.get_region():
-            # Set focus to the app forcefully
-            # because Nox does not accept hotkey if we just switch to it with keyboard
-            click()
+        if force_focus:
+            with self.get_region():
+                # Set focus to the app forcefully
+                # because Nox does not accept hotkey if we just switch to it with keyboard
+                click()
         type(text)
 
     def sleep(self, duration, reason=None, log=False):
@@ -376,3 +378,32 @@ class NoxApp(object):
             pop_response = Do.popAsk(message)
             if pop_response is False:
                 raise KeyboardInterrupt
+
+    def mapping(self, values):
+        for key, value in values.items():
+            values[key] = NoxButton(key, value, self)
+
+        return values
+
+class NoxButton:
+    def __init__(self, label, region, app):
+        self.app = app
+        try:
+            self.key = app.config.get(app.config_key, 'key_' + label)
+            Debug.user('%s key = %s', label, self.key)
+        except:
+            self.key = None
+        if self.key and self.key == self.key.upper():
+            self.key = getattr(Key, self.key)
+        self.region = self.app.get_scaled_region(*region)
+
+    def click(self):
+        if self.key:
+            return self.app.type(self.key)
+        return self.region.click()
+
+    def highlight(self, sec=1):
+        self.region.highlight(sec)
+
+    def __repr__(self):
+        return '<%s %s key=%s>' % (self.__class__, self.region, repr(self.key))
