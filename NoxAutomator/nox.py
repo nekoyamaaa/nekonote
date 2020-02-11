@@ -12,6 +12,7 @@ from sikuli import * # pylint: disable=wildcard-import,redefined-builtin,unused-
 
 from .sikulimod import MatchedImage
 from .utils import *
+from .exceptions import ScreenUnknownError
 
 class Nox(object):
     """Wrapper for NoxPlayer app"""
@@ -122,6 +123,7 @@ class NoxApp(object):
         self.scale = 1
         self.set_region(app)
         self.last_updated_at = None
+        self.unknown_count = 0
         self.app_name = self.__class__.app_name()
         self.macro_name = self.__class__.macro_name()
         self.target = None
@@ -146,6 +148,18 @@ class NoxApp(object):
             except NameError:
                 self.default_interval = 10
         Debug.user("Interval: %d", self.default_interval)
+
+        self.max_unknown = None
+        try:
+            self.max_unknown = self.config.getint(
+                self.config_key,
+                'max_unknown'
+            )
+        except ConfigParser.NoOptionError:
+            pass
+        if not self.max_unknown:
+            self.max_unknown = 6
+        Debug.user("MUN: %d", self.max_unknown)
 
         self.get_region().highlight(self.HIGHLIGHT_SEC)
         self.last_match = None
@@ -270,8 +284,13 @@ class NoxApp(object):
                 result.screen,
                 result.filename
                 )
+            self.unknown_count = 0
         else:
             msg = "Current screen: {}".format(self.UNKNOWN)
+            self.unknown_count += 1
+            if self.unknown_count and self.unknown_count > self.max_unknown:
+                raise ScreenUnknownError()
+
 
         self.last_match = result
         Debug.info(msg)
@@ -368,7 +387,7 @@ class NoxApp(object):
                 self.play_error_sound()
                 pop_response = Do.popAsk(message, timeout)
                 if pop_response is False:
-                    raise KeyboardInterrupt
+                    exit()
                 elif pop_response is None:
                     pass
                 else:
@@ -377,7 +396,7 @@ class NoxApp(object):
             self.play_error_sound()
             pop_response = Do.popAsk(message)
             if pop_response is False:
-                raise KeyboardInterrupt
+                exit()
 
     def mapping(self, values):
         for key, value in values.items():

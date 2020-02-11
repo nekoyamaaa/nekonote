@@ -12,6 +12,7 @@ from sikuli import * # pylint: disable=wildcard-import,redefined-builtin,unused-
 
 from utils import *
 from nox import Nox, NoxApp
+from exceptions import ScreenUnknownError
 
 SIGINT_CALLED = False
 
@@ -36,6 +37,11 @@ def do_loop(app):
             sleep_sec = random_sec(sleep_sec)
 
             app.sleep(sleep_sec, reason="", log=True)
+        except ScreenUnknownError:
+            try:
+                app.ask(u"画面判定に連続して失敗しました。\n手動で画面を進めて「はい」を押すか、終了する場合は「いいえ」を押してください。")
+            except KeyboardInterrupt:
+                sigint_handler()
         except KeyboardInterrupt:
             sigint_handler()
 
