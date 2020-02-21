@@ -14,6 +14,47 @@ from .sikulimod import MatchedImage
 from .utils import *
 from .exceptions import ScreenUnknownError
 
+def get_nox(config):
+    nox = os.environ.get("REGION")
+    if nox:
+        return Region(*[int(x) for x in nox.split(",")])
+
+    datafile = os.path.join(APP_ROOT, '.region')
+    if os.path.isfile(datafile):
+        with open(datafile) as fp:
+            nox = fp.read().strip()
+        try:
+            nox = Region(*[int(x) for x in nox.split(",")])
+        except:
+            nox = None
+    if nox:
+        nox.highlight()
+        q = u'前回と同じ範囲で実行します。よろしいですか？'
+        response = popAsk(q)
+        nox.highlightOff()
+        if response:
+            return nox
+
+    nox_path = config.get('Nox', 'path')
+
+    if Settings.isWindows() and nox_path:
+        nox = Nox(nox_path)
+        if nox.is_running():
+            Debug.user("app: %s, running: %s, windows: %s", nox.app, nox.app.isRunning(), nox.app.windows)
+            return nox
+        else:
+            Debug.info("Nox is not running")
+
+    popup(u"NoxPlayer を準備し、最前面に出して OK を押してください。", u"Nox を準備")
+    # Sikuli sometimes varnish message very fast.
+    # Add wait to avoit the issue.
+    time.sleep(1)
+    nox = selectRegion(u"Nox の画面範囲をドラッグして選択")
+    with open(datafile, 'w') as fp:
+        fp.write('%d,%d,%d,%d' % (nox.x, nox.y, nox.w, nox.h))
+    Debug.info("Nox region: %s", nox)
+    return nox
+
 class Nox(object):
     """Wrapper for NoxPlayer app"""
     TITLEBAR_HEIGHT = 32

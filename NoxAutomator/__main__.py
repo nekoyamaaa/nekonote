@@ -15,7 +15,7 @@ target = NoxAutomator.ask_macro(macroname)
 if not target:
     sys.exit()
 
-nox = NoxAutomator.get_nox(config.get('Nox', 'path'))
+nox = NoxAutomator.get_nox(config)
 APP = target(nox, config)
 
 NoxAutomator.do_loop(APP)

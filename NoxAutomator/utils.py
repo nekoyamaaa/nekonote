@@ -54,7 +54,17 @@ def humanize_sec(t):
 
 
 def load_config():
-    config = ConfigParser.SafeConfigParser(allow_no_value=True)
+    from sikuli import Settings
+    if Settings.isWindows():
+        nox_path = r'C:\Program Files (x86)\Nox\bin\Nox.exe'
+    else:
+        nox_path = None
+    config = ConfigParser.SafeConfigParser(
+        allow_no_value=True,
+        defaults={
+            'path': nox_path,
+        }
+    )
     config.read([
         os.path.join(DATA_DIR, "default.ini"),
         os.path.join(APP_ROOT, "settings.ini"),

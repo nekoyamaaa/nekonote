@@ -11,7 +11,7 @@ import org.sikuli.script.SikulixForJython
 from sikuli import * # pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
 
 from utils import *
-from nox import Nox, NoxApp
+from nox import Nox, NoxApp, get_nox
 from exceptions import ScreenUnknownError
 
 SIGINT_CALLED = False
@@ -71,28 +71,6 @@ def ask_macro(macro):
         return None
 
     return all_macros[choises.index(macro)]
-
-def get_nox(nox_path):
-    nox = os.environ.get("REGION")
-    if nox:
-        return Region(*[int(x) for x in nox.split(",")])
-
-    if Settings.isWindows() and nox_path:
-        nox = Nox(nox_path)
-        if nox.is_running():
-            Debug.user("app: %s, running: %s, windows: %s", nox.app, nox.app.isRunning(), nox.app.windows)
-            return nox
-        else:
-            Debug.info("Nox is not running")
-
-    popup(u"NoxPlayer を準備し、最前面に出して OK を押してください。", u"Nox を準備")
-    # Sikuli sometimes varnish message very fast.
-    # Add wait to avoit the issue.
-    time.sleep(1)
-    nox = selectRegion(u"Nox の画面範囲をドラッグして選択")
-    Debug.info("Nox region: %s", nox)
-    return nox
-
 
 Settings.LogTime = True
 Settings.UserLogs = is_debug()
