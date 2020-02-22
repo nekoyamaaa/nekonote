@@ -11,7 +11,8 @@ import org.sikuli.script.SikulixForJython
 from sikuli import * # pylint: disable=wildcard-import,redefined-builtin,unused-wildcard-import
 
 from utils import *
-from nox import Nox, NoxApp, get_nox
+from nox import Nox, get_nox
+from macro import Macro
 from exceptions import ScreenUnknownError
 
 SIGINT_CALLED = False
@@ -56,7 +57,7 @@ def get_all_macros():
         all_macros += [
                     m[1] for m in inspect.getmembers(
                 sys.modules[plugin_path],
-                lambda member: inspect.isclass(member) and issubclass(member, NoxApp)
+                lambda member: inspect.isclass(member) and issubclass(member, Macro)
                 )]
     return all_macros
 

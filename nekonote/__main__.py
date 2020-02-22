@@ -2,20 +2,20 @@
 
 import sys
 
-import NoxAutomator
+import nekonote
 
-config = NoxAutomator.load_config()
+config = nekonote.load_config()
 
 try:
     macroname = sys.argv[1]
 except IndexError:
     macroname = None
-target = NoxAutomator.ask_macro(macroname)
+target = nekonote.ask_macro(macroname)
 
 if not target:
     sys.exit()
 
-nox = NoxAutomator.get_nox(config)
+nox = nekonote.get_nox(config)
 APP = target(nox, config)
 
-NoxAutomator.do_loop(APP)
+nekonote.do_loop(APP)

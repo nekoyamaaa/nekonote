@@ -1,4 +1,4 @@
-APP = $(shell basename $(shell pwd))
+APP = "nekonote"
 ZIPNAME = build/${APP}.zip
 BUNDLE_ZIPNAME = build/bundle.zip
 FULL_ZIPNAME = build/${APP}-bundled.zip
@@ -21,7 +21,7 @@ clean: cleanobj
 cleanobj:
 	find -name '*$.class' -type f -delete
 
-ZIP_TARGETS = NoxAutomator/* macros/* data/* ${LAUNCHERS} README.md
+ZIP_TARGETS = nekonote/* macros/* data/* ${LAUNCHERS} README.md
 ZIP_ARGS = ${ZIP_TARGETS} --exclude @.zipignore
 
 ${ZIPNAME}: ${ZIP_TARGETS}
@@ -40,8 +40,8 @@ ${BUNDLE_ZIPNAME}: ${jars}
 JAVA_ARGS = --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
 
 ${APP}.bat:
-	echo 'cmd /k java.exe ${JAVA_ARGS} -cp "${SIKULI_PATH};${JYTHON_PATH}" org.python.util.jython -m NoxAutomator' > $@
+	echo 'cmd /k java.exe ${JAVA_ARGS} -cp "${SIKULI_PATH};${JYTHON_PATH}" org.python.util.jython -m nekonote' > $@
 
 ${APP}.sh:
-	echo 'java ${JAVA_ARGS} -cp "${SIKULI_PATH}:${JYTHON_PATH}" org.python.util.jython -m NoxAutomator $$@' > $@
+	echo 'java ${JAVA_ARGS} -cp "${SIKULI_PATH}:${JYTHON_PATH}" org.python.util.jython -m nekonote $$@' > $@
 	chmod +x $@
