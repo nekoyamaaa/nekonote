@@ -17,8 +17,7 @@ class Macro(object):
     APP_NAME = None
     LABEL = None
 
-    IMAGE_ORIGINAL_WINDOW_HEIGHT = 375
-    IMAGE_ORIGINAL_WINDOW_WIDTH = 667
+    IMAGE_ORIGINAL = (668, 375)
     UNKNOWN = "unknown"
     HIGHLIGHT_SEC = 1
     CONFIG_JOINER = '.'
@@ -116,9 +115,9 @@ class Macro(object):
 
     def adjust_scale(self):
         if self.scale_base == "width":
-            scale = self.get_region().w / float(self.IMAGE_ORIGINAL_WINDOW_WIDTH)
+            scale = self.get_region().w / float(self.IMAGE_ORIGINAL[0])
         else:
-            scale = self.get_region().h / float(self.IMAGE_ORIGINAL_WINDOW_HEIGHT)
+            scale = self.get_region().h / float(self.IMAGE_ORIGINAL[1])
         if scale != self.scale:
             self.scale = scale
             Settings.AlwaysResize = self.scale
@@ -172,11 +171,25 @@ class Macro(object):
         if self.region is None:
             self.region = Region(Screen())
 
-    def detect_current(self, retry=1):
+    def detect_current(self, retry=1, includes=None, excludes=None):
         result = None
+        if includes or excludes:
+            candidates = []
+            for c in self.screen_candidates:
+                for screenname in (includes or []):
+                    if c.startswith(screenname):
+                        candidates.append(c)
+                for screenname in (excludes or []):
+                    if not c.startswith(screenname):
+                        candidates.append(c)
+        else:
+            candidates = self.screen_candidates
+
+        if not candidates:
+            raise ValueError('All candidates are filtered.')
         with self.get_target():
             for _ in range(retry):
-                matches = findAnyList(self.screen_candidates)
+                matches = findAnyList(candidates)
                 self.last_updated_at = time.time()
                 if matches:
                     matched_images = []
