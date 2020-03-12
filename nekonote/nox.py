@@ -37,11 +37,11 @@ def get_nox(config):
         else:
             Debug.info("Nox is not running")
 
-    popup(u"NoxPlayer を準備し、最前面に出して OK を押してください。", u"Nox を準備")
+    popup(u"次の画面で操作対象の範囲を選択します。ゲームを準備して最前面に出し、 OK を押してください。", u"アプリケーションを準備")
     # Sikuli sometimes varnish message very fast.
     # Add wait to avoit the issue.
     time.sleep(1)
-    nox = selectRegion(u"Nox の画面範囲をドラッグして選択")
+    nox = selectRegion(u"Click and drag the game screen.")
     with open(datafile, 'w') as fp:
         fp.write('%d,%d,%d,%d' % (nox.x, nox.y, nox.w, nox.h))
     Debug.info("Nox region: %s", nox)
