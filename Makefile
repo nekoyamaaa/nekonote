@@ -40,8 +40,10 @@ ${BUNDLE_ZIPNAME}: ${jars}
 JAVA_ARGS = --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
 
 ${APP}.bat:
-	echo 'cmd /k java.exe ${JAVA_ARGS} -cp "${SIKULI_PATH};${JYTHON_PATH}" org.python.util.jython -m nekonote' > $@
+	echo 'cd %~dp0' > $@
+	echo 'java.exe ${JAVA_ARGS} -cp "${SIKULI_PATH};${JYTHON_PATH}" org.python.util.jython -m nekonote' >> $@
 
 ${APP}.sh:
-	echo 'java ${JAVA_ARGS} -cp "${SIKULI_PATH}:${JYTHON_PATH}" org.python.util.jython -m nekonote $$@' > $@
+	echo 'cd $$(dirname $$0)' > $@
+	echo 'java ${JAVA_ARGS} -cp "${SIKULI_PATH}:${JYTHON_PATH}" org.python.util.jython -m nekonote $$@' >> $@
 	chmod +x $@
